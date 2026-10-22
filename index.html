@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f3f5ee" />
+    <meta name="description" content="命令ブロックでロボットを動かす3Dプログラミングパズル" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./app-icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./app-icon.svg" />
+    <link rel="stylesheet" href="./src/style.css" />
+    <title>PATHCODE 3D</title>
+    <script src="./vendor/blockly.min.js"></script>
+    <script type="module" src="./src/main.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark"><span></span><span></span><span></span></div>
+        <div>
+          <strong>PATHCODE</strong>
+          <small>3D LOGIC LAB</small>
+        </div>
+      </div>
+      <div class="level-tabs" id="levelTabs" aria-label="レベル選択"></div>
+      <div class="top-actions">
+        <button class="icon-button" id="soundBtn" aria-label="サウンド切替" title="サウンド切替"><i data-lucide="volume-2"></i></button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="program panel">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">WORKSPACE</span>
+            <h2>Blocklyワークスペース</h2>
+          </div>
+          <button class="text-button" id="clearBtn">クリア</button>
+        </div>
+        <div class="program-track blockly-surface" id="programTrack">
+          <div id="blocklyDiv" class="blockly-div"></div>
+          <xml id="blocklyToolbox" style="display: none">
+            <block type="robot_move_forward"></block>
+          </xml>
+        </div>
+        <div class="run-controls">
+          <button class="run-button" id="runBtn"><i data-lucide="play"></i>実行する</button>
+          <button class="icon-button reset-button" id="resetBtn" aria-label="リセット" title="リセット"><i data-lucide="rotate-ccw"></i></button>
+        </div>
+      </section>
+
+      <section class="stage panel">
+        <div class="stage-head">
+          <div>
+            <span class="eyebrow">STAGE VIEW</span>
+            <h1 id="levelTitle">はじめの一歩</h1>
+          </div>
+          <div class="objective"><span class="objective-dot"></span><span id="objectiveText">エネルギーを回収しよう</span></div>
+        </div>
+        <div class="camera-modes" role="group" aria-label="カメラの表示モード">
+          <button type="button" data-camera-mode="north" aria-pressed="false">ノースアップ</button>
+          <button type="button" data-camera-mode="heading" aria-pressed="false">ヘディングアップ</button>
+          <button type="button" data-camera-mode="first-person" aria-pressed="true">1人称視点</button>
+          <button type="button" data-camera-mode="free" aria-pressed="false">自由視点</button>
+        </div>
+        <div class="scene-wrap" id="sceneWrap">
+          <canvas id="scene"></canvas>
+          <div class="scene-status ready" id="sceneStatus">READY</div>
+          <div class="legend">
+            <span><b class="legend-energy"></b>エネルギー</span>
+            <span><b class="legend-wall"></b>障害物</span>
+          </div>
+        </div>
+        <div class="stage-footer">
+          <div class="stats">
+            <div><span>STEP</span><strong id="stepCount">0 / 8</strong></div>
+            <div><span>ENERGY</span><strong id="energyCount">0 / 1</strong></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+  </body>
+</html>

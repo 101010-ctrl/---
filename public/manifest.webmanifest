@@ -1,0 +1,19 @@
+{
+  "name": "PATHCODE 3D",
+  "short_name": "PATHCODE",
+  "description": "命令ブロックでロボットを動かす3Dプログラミングパズル",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f5ee",
+  "theme_color": "#f3f5ee",
+  "icons": [
+    {
+      "src": "./app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

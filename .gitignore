@@ -1,0 +1,36 @@
+# Dependencies and build caches (kept locally).
+node_modules/
+.npm-cache/
+.pnpm-store/
+.tmp-build/
+dist/
+backups/
+work/
+
+# Local operating system and editor files.
+.DS_Store
+.idea/
+.vscode/
+*.log
+
+# Local credentials and environment settings.
+.env
+.env.*
+!.env.example
+!.env.sample
+.npmrc
+.netrc
+.git-credentials
+.aws/
+.ssh/
+.codex/
+secrets/
+credentials/
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+service-account*.json
+
+# outputs/pathcode-3d.html is intentionally tracked for distribution.
