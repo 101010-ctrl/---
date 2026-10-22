@@ -31,7 +31,8 @@ pnpm run build:portable
 
 Gitは変更履歴をこのPCに記録する仕組みです。
 commitはPC内への記録、pushはGitHubへの送信です。
-このプロジェクトは指定されたPrivateリポジトリで管理します。
+このプロジェクトは指定されたGitHubリポジトリで管理します。
+公開範囲はGitHub側の設定で確認し、Codexが無断で変更しない運用にします。
 
 Codexには次のように依頼できます。
 
@@ -55,6 +56,26 @@ git commit -m "Describe the game update"
 
 GitHubの認証にはGitHub CLIやブラウザの認証を使い、パスワードや
 アクセストークンをソースコード、チャット、リポジトリURLに書かないでください。
+
+## GitHub Pagesでゲームを公開する
+
+リポジトリ直下の `index.html` は開発用です。これをそのまま公開すると、
+ブラウザが `three` などの依存ライブラリを解決できず、画面の枠だけが表示されます。
+
+`.github/workflows/pages.yml` は、更新済みの `outputs/pathcode-3d.html` だけを
+公開用の `index.html` として配置します。ソース、バックアップ、認証ファイルを
+公開用の成果物に含めません。機密情報チェックを通過した場合のみ公開します。
+
+導入時は、pushと公開設定変更の承認を得た後、リポジトリの
+Settings → Pages → Build and deployment → Source を GitHub Actions にします。
+設定後は、承認済みの変更を `main` にpushするとサイトが更新されます。
+ゲーム変更時は、push前に必ず `pnpm run build:portable` で単体HTMLを更新します。
+
+Pagesの公開設定と、リポジトリのPublic/Private設定は別です。
+リポジトリ自体をPrivateにしていても、Pagesのアクセス制限がない場合、
+公開したゲームにはURLを知っている人がアクセスできます。
+
+参考: https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages
 
 ## 保存対象と機密情報
 

@@ -1,0 +1,44 @@
+name: Publish PATHCODE 3D
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the approved game
+        uses: actions/checkout@v6
+      - name: Check for secrets
+        run: node scripts/check-secrets.mjs
+      - name: Prepare the standalone game as the site entry point
+        run: |
+          mkdir -p _site
+          cp outputs/pathcode-3d.html _site/index.html
+      - name: Upload only the playable game
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    needs: prepare
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
