@@ -102,6 +102,27 @@ const levels = [
     ]
   },
   {
+    title: 'まがり道',
+    objective: 'すすむ・ひだりへ・みぎへでエネルギーを回収',
+    width: 3,
+    depth: 3,
+    start: [0, 2],
+    dir: 0,
+    energy: [[2, 0]],
+    tiles: [[0, 2], [1, 2], [1, 1], [2, 1], [2, 0]],
+    walls: [],
+    blockLimits: { robot_move_forward: 4, robot_turn_left: 2, robot_turn_right: 1 },
+    expectedProgram: [
+      { type: 'robot_move_forward' },
+      { type: 'robot_turn_left' },
+      { type: 'robot_move_forward' },
+      { type: 'robot_turn_right' },
+      { type: 'robot_move_forward' },
+      { type: 'robot_turn_left' },
+      { type: 'robot_move_forward' }
+    ]
+  },
+  {
     title: 'くりかえし',
     objective: '指定回数のブロックだけでエネルギーを回収',
     width: 4,
@@ -293,16 +314,19 @@ function toolboxXmlForLevel(index) {
   const counts = workspaceBlockCounts();
   const disabled = type => counts[type] >= (level.blockLimits?.[type] || 0) ? ' disabled="true"' : '';
   const remaining = type => Math.max(0, (level.blockLimits?.[type] || 0) - (counts[type] || 0));
-  const repeatBlock = index >= 1 ? `<block type="repeat_times"${disabled('repeat_times')}></block>` : '';
-  const turnBlocks = index >= 1
+  const hasRepeat = (level.blockLimits?.repeat_times || 0) > 0;
+  const hasTurns = (level.blockLimits?.robot_turn_right || 0) > 0 || (level.blockLimits?.robot_turn_left || 0) > 0;
+  const repeatBlock = hasRepeat ? `<block type="repeat_times"${disabled('repeat_times')}></block>` : '';
+  const turnBlocks = hasTurns
     ? `
       <block type="robot_turn_right"${disabled('robot_turn_right')}></block>
       <block type="robot_turn_left"${disabled('robot_turn_left')}></block>
     `
     : '';
-  const labels = index >= 1
+  const repeatLabel = hasRepeat ? `<label text="残り: くりかえし ${remaining('repeat_times')}回"></label>` : '';
+  const labels = hasTurns
     ? `
-      <label text="残り: くりかえし ${remaining('repeat_times')}回"></label>
+      ${repeatLabel}
       <label text="すすむ ${remaining('robot_move_forward')}回 / みぎへ ${remaining('robot_turn_right')}回 / ひだりへ ${remaining('robot_turn_left')}回"></label>
     `
     : `<label text="残り: すすむ ${remaining('robot_move_forward')}回"></label>`;
