@@ -71,14 +71,15 @@ const blockDefinitions = [
 window.PATHCODE_BLOCK_DEFINITIONS = blockDefinitions;
 
 function registerBlocklyGenerators(javascriptGenerator) {
-  javascriptGenerator.forBlock.path_start = (block, generator) => generator.statementToCode(block, 'STACK');
-  javascriptGenerator.forBlock.robot_move_forward = () => 'await pathcode.moveForward();\n';
-  javascriptGenerator.forBlock.robot_turn_right = () => 'await pathcode.turnRobot("right");\n';
-  javascriptGenerator.forBlock.robot_turn_left = () => 'await pathcode.turnRobot("left");\n';
+  const highlight = (block, pause = 0) => `await pathcode.highlightBlock(${JSON.stringify(block.id)}, ${pause});\n`;
+  javascriptGenerator.forBlock.path_start = (block, generator) => highlight(block, 120) + generator.statementToCode(block, 'STACK');
+  javascriptGenerator.forBlock.robot_move_forward = block => highlight(block) + 'await pathcode.moveForward();\n';
+  javascriptGenerator.forBlock.robot_turn_right = block => highlight(block) + 'await pathcode.turnRobot("right");\n';
+  javascriptGenerator.forBlock.robot_turn_left = block => highlight(block) + 'await pathcode.turnRobot("left");\n';
   javascriptGenerator.forBlock.repeat_times = (block, generator) => {
     const times = Math.max(1, Math.min(5, Number(block.getFieldValue('TIMES')) || 1));
     const branch = generator.statementToCode(block, 'DO');
-    return `for (let i = 0; i < ${times}; i += 1) {\n${branch}}\n`;
+    return `for (let i = 0; i < ${times}; i += 1) {\n${highlight(block, 140)}${branch}}\n`;
   };
 }
 
@@ -160,6 +161,7 @@ let blocklyWorkspace;
 let startBlock;
 let lastToolboxXml = '';
 let levelIndex = 0;
+let unlockedLevelIndex = 0;
 let running = false;
 let collected = new Set();
 let stepIndex = 0;
@@ -227,11 +229,20 @@ function createIcons() {
 }
 
 function initTabs() {
-  $('levelTabs').innerHTML = levels.map((_, i) => `<button class="level-tab ${i === 0 ? 'active' : ''}" data-level="${i}">LEVEL ${String(i + 1).padStart(2, '0')}</button>`).join('');
+  renderLevelTabs();
   $('levelTabs').addEventListener('click', e => {
     const button = e.target.closest('[data-level]');
-    if (button && !running) loadLevel(Number(button.dataset.level));
+    if (button && !button.disabled && !running) loadLevel(Number(button.dataset.level));
   });
+}
+
+function renderLevelTabs() {
+  $('levelTabs').innerHTML = levels.map((_, i) => {
+    const locked = i > unlockedLevelIndex;
+    const label = `LEVEL ${String(i + 1).padStart(2, '0')}`;
+    const hint = locked ? `LEVEL ${String(i).padStart(2, '0')}をクリアすると解放` : '';
+    return `<button class="level-tab ${i === levelIndex ? 'active' : ''} ${locked ? 'locked' : ''}" data-level="${i}"${locked ? ` disabled title="${hint}" aria-label="${label} 未解放：${hint}"` : ''}>${label}${locked ? '<span class="level-lock-label">未解放</span>' : ''}</button>`;
+  }).join('');
 }
 
 function initProgram() {
@@ -418,6 +429,7 @@ function resizeCanvas() {
 }
 
 function loadLevel(index) {
+  if (!Number.isInteger(index) || index < 0 || index > unlockedLevelIndex) return;
   levelIndex = index;
   const level = levels[index];
   document.querySelectorAll('.level-tab').forEach((button, i) => button.classList.toggle('active', i === index));
@@ -461,6 +473,7 @@ function expose3DApi() {
     setObjectColor,
     moveForward,
     turnRobot,
+    highlightBlock,
     reset: resetRun
   };
   window.scene = scene3d;
@@ -482,6 +495,12 @@ function updateGeneratedCode() {
   const code = getJavascriptGenerator().workspaceToCode(blocklyWorkspace);
   if ($('generatedCode')) $('generatedCode').textContent = code.trim();
   return code;
+}
+
+async function highlightBlock(id, pause = 0) {
+  if (!running) return;
+  blocklyWorkspace?.highlightBlock(id);
+  if (pause > 0) await wait(pause);
 }
 
 function currentProgramShape() {
@@ -578,6 +597,7 @@ async function runProgram() {
     ].join('\n');
     const runGeneratedCode = new AsyncFunction('pathcode', 'scene', 'cube', 'robot', guardedCode);
     await runGeneratedCode(window.pathcode, canvas, window.cube, window.robot);
+    blocklyWorkspace?.highlightBlock(null);
     await finishRun(canComplete);
   } catch (error) {
     console.error(error);
@@ -586,6 +606,7 @@ async function runProgram() {
       await returnToStart();
     }
   } finally {
+    blocklyWorkspace?.highlightBlock(null);
     running = false;
     updateRunButton();
     updateStats();
@@ -670,6 +691,7 @@ async function bump(dx, dz) {
 }
 
 async function returnToStart() {
+  blocklyWorkspace?.highlightBlock(null);
   await wait(160);
   const start = { ...robotState };
   const level = levels[levelIndex];
@@ -702,6 +724,8 @@ function isGoal() {
 async function finishRun(canComplete = true) {
   if (canComplete && isGoal()) {
     setStatus('MISSION COMPLETE', 'success');
+    unlockedLevelIndex = Math.max(unlockedLevelIndex, Math.min(levelIndex + 1, levels.length - 1));
+    renderLevelTabs();
     return;
   }
 

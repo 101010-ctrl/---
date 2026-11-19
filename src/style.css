@@ -25,9 +25,11 @@ button:focus-visible { outline: 3px solid rgba(19,170,189,.28); outline-offset: 
 .brand-mark span { border-radius: 2px; background: var(--cyan); }
 .brand-mark span:nth-child(2) { background: var(--yellow); transform: translateY(5px); }
 .brand-mark span:nth-child(3) { background: var(--coral); transform: translateY(10px); }
-.level-tabs { display: flex; padding: 4px; border: 1px solid var(--line); background: #eef0ea; border-radius: 7px; }
+.level-tabs { display: flex; min-height: 52px; padding: 4px; border: 1px solid var(--line); background: #eef0ea; border-radius: 7px; }
 .level-tab { border: 0; background: transparent; min-width: 92px; padding: 8px 13px; border-radius: 5px; font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer; }
 .level-tab.active { background: #fff; color: var(--ink); box-shadow: 0 1px 5px rgba(31,40,34,.12); }
+.level-tab.locked { color: #727b80; background: #e0e5e7; box-shadow: inset 0 0 0 1px #c6cdd1; cursor: not-allowed; }
+.level-lock-label { display: block; margin-top: 2px; font-size: 9px; font-weight: 500; line-height: 12px; }
 .top-actions { justify-self: end; display: flex; gap: 8px; }
 .icon-button { width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 6px; background: #fff; display: inline-grid; place-items: center; cursor: pointer; }
 .icon-button svg { width: 17px; height: 17px; stroke-width: 2; }
@@ -49,6 +51,12 @@ button:focus-visible { outline: 3px solid rgba(19,170,189,.28); outline-offset: 
 .blockly-load-error { height: 100%; display: grid; place-items: center; color: #a13a2d; background: #fff4f1; font-size: 13px; font-weight: 700; }
 .blocklyToolboxDiv, .blocklyFlyout { filter: drop-shadow(1px 0 0 rgba(0,0,0,.08)); }
 .blocklyText, .blocklyHtmlInput { font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif; }
+.blockly-surface .blocklyHighlighted > .blocklyPath {
+  stroke: #ffdc00 !important;
+  stroke-width: 3px !important;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 3px #ffdc00) drop-shadow(0 0 7px rgba(255, 220, 0, .75)) !important;
+}
 .run-controls { display: grid; grid-template-columns: minmax(0, 1fr) 36px; gap: 8px; margin-top: 18px; }
 .secondary-button, .run-button { height: 42px; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 11px; font-weight: 800; cursor: pointer; }
 .secondary-button { background: #fff; border: 1px solid var(--line); }
